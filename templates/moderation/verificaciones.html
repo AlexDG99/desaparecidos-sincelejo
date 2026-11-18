@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Verificaciones{% endblock %}
+{% block content %}
+<a href="{% url 'moderation:cola' %}">← Volver a la cola</a>
+<h1 class="h3 my-3">Verificación de identidad de familiares</h1>
+<div class="table-responsive"><table class="table align-middle">
+  <caption class="visually-hidden">Familiares pendientes de verificación</caption>
+  <thead><tr><th scope="col">Nombre</th><th scope="col">Cédula</th><th scope="col">Parentesco</th><th scope="col">Registrado</th><th scope="col"><span class="visually-hidden">Acción</span></th></tr></thead>
+  <tbody>{% for u in pendientes %}<tr><td>{{ u.nombre }}</td><td>{{ u.cedula }}</td><td>{{ u.parentesco }}</td><td>{{ u.date_joined|date:"d/m/Y H:i" }}</td><td><a class="btn btn-sm btn-primary" href="{% url 'moderation:verificacion' u.pk %}">Revisar</a></td></tr>
+  {% empty %}<tr><td colspan="5" class="text-muted">No hay verificaciones pendientes.</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endblock %}

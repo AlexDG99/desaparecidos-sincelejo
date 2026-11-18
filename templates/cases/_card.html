@@ -1,0 +1,19 @@
+{% load static %}
+<div class="col">
+  <article class="card h-100 case-card">
+    {% if c.muestra_ficha_completa and c.fotos.all %}
+      <img src="{% url 'cases:foto' c.codigo c.fotos.all.0.pk %}" class="card-img-top case-photo" alt="Fotografía de {{ c.nombre }}" loading="lazy">
+    {% else %}
+      <div class="case-photo case-photo-empty" role="img" aria-label="Sin fotografía pública"></div>
+    {% endif %}
+    <div class="card-body">
+      <h3 class="h5 card-title mb-1"><a class="stretched-link text-decoration-none" href="{{ c.get_absolute_url }}">{{ c.nombre }}</a></h3>
+      {% if c.muestra_ficha_completa %}
+        <p class="mb-1">{{ c.edad }} años{% if c.es_menor %} · <span class="badge text-bg-info">Menor de edad</span>{% endif %}</p>
+        <p class="small text-muted mb-0">Desaparecido(a) el {{ c.fecha_desaparicion|date:"d/m/Y" }}<br>{{ c.zona }}</p>
+      {% else %}
+        <p class="mb-0"><span class="badge text-bg-secondary">{{ c.get_estado_display }}</span></p>
+      {% endif %}
+    </div>
+  </article>
+</div>

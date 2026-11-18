@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Moderación{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Cola de moderación</h1>
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a class="btn btn-outline-primary" href="{% url 'moderation:verificaciones' %}">Verificaciones de familiares <span class="badge text-bg-primary">{{ n_verificaciones }}</span></a>
+  <a class="btn btn-outline-primary" href="{% url 'moderation:reportes' %}">Contenido reportado <span class="badge text-bg-primary">{{ n_reportes }}</span></a>
+  {% if n_solicitudes is not None %}<a class="btn btn-outline-primary" href="{% url 'moderation:solicitudes' %}">Solicitudes de datos <span class="badge text-bg-primary">{{ n_solicitudes }}</span></a>{% endif %}
+</div>
+<p class="text-muted small">Ordenados del más antiguo al más reciente. Meta de servicio: revisar dentro de {{ sla }} horas.</p>
+<div class="table-responsive"><table class="table align-middle">
+  <caption class="visually-hidden">Reportes pendientes de moderación</caption>
+  <thead><tr><th scope="col">Tipo</th><th scope="col">Referencia</th><th scope="col">Resumen</th><th scope="col">Autor</th><th scope="col">Enviado</th><th scope="col">Estado</th><th scope="col"><span class="visually-hidden">Acción</span></th></tr></thead>
+  <tbody>
+  {% for i in items %}<tr {% if i.vencido %}class="table-warning"{% endif %}>
+    <td>{{ i.tipo }}{% if i.menor %} <span class="badge text-bg-info">Menor</span>{% endif %}</td><td>{{ i.etiqueta }}</td><td>{{ i.resumen }}</td><td>{{ i.autor.nombre }}</td>
+    <td>{{ i.creado_en|date:"d/m/Y H:i" }}{% if i.vencido %}<br><small class="text-danger">Excede {{ sla }} h</small>{% endif %}</td><td>{{ i.estado }}</td>
+    <td><a class="btn btn-sm btn-primary" href="{{ i.url }}">Revisar</a></td></tr>
+  {% empty %}<tr><td colspan="7" class="text-muted">No hay reportes pendientes.</td></tr>{% endfor %}
+  </tbody></table></div>
+{% endblock %}

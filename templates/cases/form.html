@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Reportar desaparición{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-8">
+  <h1 class="h3 mb-2">Reportar una desaparición</h1>
+  <div class="alert alert-warning" role="note"><strong>Esta plataforma no sustituye la denuncia ante las autoridades.</strong> Si aún no lo ha hecho, denuncie ante la Policía Nacional o la Fiscalía. Puede registrar aquí el número de la denuncia (opcional).</div>
+  <form method="post" enctype="multipart/form-data" novalidate id="form-caso">
+    {% csrf_token %}
+    {% include '_form.html' %}
+    <p class="small text-muted">Su caso se publicará después de ser revisado por un moderador.</p>
+    <button class="btn btn-primary" type="submit">Enviar caso a revisión</button>
+  </form>
+</div></div>
+{% endblock %}
+{% block scripts %}{% load static %}<script src="{% static 'js/case_form.js' %}"></script>{% endblock %}

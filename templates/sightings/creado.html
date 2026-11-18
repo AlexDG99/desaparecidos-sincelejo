@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Avistamiento enviado{% endblock %}
+{% block content %}
+<div class="text-center py-4">
+  <h1 class="h3">Gracias por su aporte</h1>
+  <p>Su avistamiento quedó <span class="badge text-bg-warning">Pendiente de moderación</span>. No se publicará hasta que un moderador lo apruebe.</p>
+  <a class="btn btn-primary" href="{{ caso.get_absolute_url }}">Volver al caso</a>
+</div>
+{% endblock %}

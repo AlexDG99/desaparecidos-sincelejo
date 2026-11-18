@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Verificación de identidad{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+  <h1 class="h3 mb-3">Verificación de identidad</h1>
+  {% if usuario.verificacion == 'rechazada' %}<div class="alert alert-warning" role="alert"><strong>Su verificación fue rechazada.</strong> Motivo: {{ usuario.verificacion_motivo }}</div>
+  {% else %}<div class="alert alert-info" role="status">Sus datos están pendientes de revisión. Puede corregirlos si lo desea.</div>{% endif %}
+  <form method="post" novalidate>{% csrf_token %}{% include '_form.html' %}<button class="btn btn-primary" type="submit">Enviar datos corregidos</button></form>
+</div></div>
+{% endblock %}

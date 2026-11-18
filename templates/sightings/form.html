@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Reportar avistamiento{% endblock %}
+{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-8">
+  <h1 class="h3 mb-1">Reportar un avistamiento</h1>
+  <p class="text-muted">Caso <strong>{{ caso.codigo }}</strong> · {{ caso.nombre }}</p>
+  <div class="alert alert-warning" role="note">Si la persona está en peligro inmediato, llame a la línea de emergencias <strong>123</strong>. No intente abordarla usted mismo(a).</div>
+  <form method="post" enctype="multipart/form-data" novalidate id="form-avistamiento">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="row">
+      <div class="col-md-6 mb-3">{{ form.fecha.label_tag }}{{ form.fecha }}{% for e in form.fecha.errors %}<div class="invalid-feedback d-block" role="alert">{{ e }}</div>{% endfor %}</div>
+      <div class="col-md-6 mb-3">{{ form.hora.label_tag }}{{ form.hora }}{% for e in form.hora.errors %}<div class="invalid-feedback d-block" role="alert">{{ e }}</div>{% endfor %}</div>
+    </div>
+    <fieldset class="mb-3">
+      <legend class="h6">Ubicación</legend>
+      <p class="form-text">Marque el punto en el mapa, use su ubicación actual o escriba una dirección o barrio.</p>
+      <div id="mapa-selector" class="map map-small mb-2" role="application" aria-label="Mapa para marcar la ubicación del avistamiento"></div>
+      <button type="button" class="btn btn-sm btn-outline-primary mb-2" id="btn-ubicacion">Usar mi ubicación actual</button>
+      {{ form.latitud }}{{ form.longitud }}
+      {{ form.direccion.label_tag }}{{ form.direccion }}
+      {% for e in form.direccion.errors %}<div class="invalid-feedback d-block" role="alert">{{ e }}</div>{% endfor %}
+    </fieldset>
+    <div class="mb-3">{{ form.descripcion.label_tag }}{{ form.descripcion }}<div class="form-text">{{ form.descripcion.help_text }}</div>{% for e in form.descripcion.errors %}<div class="invalid-feedback d-block" role="alert">{{ e }}</div>{% endfor %}</div>
+    <div class="mb-3">{{ form.evidencias.label_tag }}{{ form.evidencias }}<div class="form-text">{{ form.evidencias.help_text }}</div>{% for e in form.evidencias.errors %}<div class="invalid-feedback d-block" role="alert">{{ e }}</div>{% endfor %}</div>
+    <div id="progreso" class="mb-3 d-none">
+      <div class="progress" role="progressbar" aria-label="Progreso de carga" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar" style="width:0%">0%</div></div>
+      <button type="button" class="btn btn-sm btn-outline-danger mt-2" id="btn-cancelar">Cancelar carga</button>
+    </div>
+    <p class="small text-muted">Su reporte será revisado por un moderador antes de publicarse.</p>
+    <button class="btn btn-danger" type="submit" id="btn-enviar">Enviar avistamiento</button>
+  </form>
+  {{ centro|json_script:"centro-mapa" }}
+</div></div>
+{% endblock %}
+{% block scripts %}<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="{% static 'js/mapa_base.js' %}"></script><script src="{% static 'js/sighting_form.js' %}"></script>{% endblock %}

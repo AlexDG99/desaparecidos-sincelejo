@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Resolver reportes{% endblock %}
+{% block content %}
+<a href="{% url 'moderation:reportes' %}">← Volver</a>
+<h1 class="h3 my-3">Contenido reportado</h1>
+<div class="card card-body mb-3">
+  {% if tipo == 'caso' %}<h2 class="h5"><a href="{{ objeto.get_absolute_url }}">{{ objeto.codigo }} · {{ objeto.nombre }}</a></h2><p>{{ objeto.senas|linebreaksbr }}</p>
+  {% else %}<h2 class="h5"><a href="{{ objeto.get_absolute_url }}">Avistamiento #{{ objeto.pk }} en {{ objeto.caso.codigo }}</a></h2><p>{{ objeto.descripcion|linebreaksbr }}</p>{% endif %}
+</div>
+<h2 class="h6">Reportes recibidos</h2>
+<ul class="list-group mb-3">{% for r in reportes %}<li class="list-group-item"><strong>{{ r.get_motivo_display }}</strong> · {{ r.reportero.nombre }} · {{ r.creado_en|date:"d/m/Y H:i" }}{% if r.comentario %}<br>{{ r.comentario }}{% endif %}</li>{% endfor %}</ul>
+<form method="post" novalidate>{% csrf_token %}{% include '_form.html' %}<button class="btn btn-primary" type="submit">Registrar decisión</button></form>
+{% endblock %}

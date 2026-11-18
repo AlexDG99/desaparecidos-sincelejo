@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Contenido reportado{% endblock %}
+{% block content %}
+<a href="{% url 'moderation:cola' %}">← Volver a la cola</a>
+<h1 class="h3 my-3">Contenido reportado por usuarios</h1>
+<p class="text-muted small">Prioridad alta: {{ umbral }} o más reportes de usuarios distintos.</p>
+<div class="table-responsive"><table class="table align-middle">
+  <caption class="visually-hidden">Contenido con reportes pendientes</caption>
+  <thead><tr><th scope="col">Prioridad</th><th scope="col">Tipo</th><th scope="col">Contenido</th><th scope="col">Reportes</th><th scope="col">Motivos</th><th scope="col"><span class="visually-hidden">Acción</span></th></tr></thead>
+  <tbody>{% for g in grupos %}<tr {% if g.prioridad_alta %}class="table-danger"{% endif %}>
+    <td>{% if g.prioridad_alta %}<span class="badge text-bg-danger">Alta</span>{% else %}Normal{% endif %}</td>
+    <td>{{ g.tipo|capfirst }}</td>
+    <td>{% if g.tipo == 'caso' %}{{ g.objeto.codigo }} · {{ g.objeto.nombre }}{% else %}#{{ g.objeto.pk }} en {{ g.objeto.caso.codigo }}{% endif %}</td>
+    <td>{{ g.reportes|length }} ({{ g.reporteros|length }} usuario{{ g.reporteros|length|pluralize }})</td>
+    <td>{% for r in g.reportes %}{{ r.get_motivo_display }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+    <td><a class="btn btn-sm btn-primary" href="{% url 'moderation:reporte_resolver' g.tipo g.objeto.pk %}">Revisar</a></td></tr>
+  {% empty %}<tr><td colspan="6" class="text-muted">No hay contenido reportado pendiente.</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endblock %}

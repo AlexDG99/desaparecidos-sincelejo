@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Revisar avistamiento{% endblock %}
+{% block content %}
+<a href="{% url 'moderation:cola' %}">← Volver a la cola</a>
+<h1 class="h3 my-3">Revisar avistamiento #{{ av.pk }} <span class="badge text-bg-warning">{{ av.get_moderacion_display }}</span></h1>
+<dl class="row">
+  <dt class="col-sm-3">Caso</dt><dd class="col-sm-9"><a href="{{ av.caso.get_absolute_url }}">{{ av.caso.codigo }} · {{ av.caso.nombre }}</a></dd>
+  <dt class="col-sm-3">Fecha y hora</dt><dd class="col-sm-9">{{ av.fecha|date:"d/m/Y" }} {{ av.hora|time:"H:i" }}</dd>
+  <dt class="col-sm-3">Ubicación</dt><dd class="col-sm-9">{{ av.direccion|default:"—" }}{% if av.latitud %} ({{ av.latitud }}, {{ av.longitud }}){% endif %}</dd>
+  <dt class="col-sm-3">Descripción</dt><dd class="col-sm-9">{{ av.descripcion|linebreaksbr }}</dd>
+  <dt class="col-sm-3">Autor</dt><dd class="col-sm-9">{{ av.autor.nombre }} ({{ av.autor.email }}) · IP {{ av.ip|default:"—" }}</dd>
+  <dt class="col-sm-3">Evidencia</dt><dd class="col-sm-9">{% for m in av.archivos.all %}
+    {% if m.tipo == 'imagen' %}<a href="{% url 'sightings:media' m.pk %}" target="_blank" rel="noopener"><img class="thumb" src="{% url 'sightings:media' m.pk %}" alt="Evidencia {{ forloop.counter }}"></a>
+    {% else %}<video class="thumb-video" controls preload="none" src="{% url 'sightings:media' m.pk %}"></video>{% endif %}{% empty %}Sin archivos adjuntos.{% endfor %}</dd>
+</dl>
+{% include 'moderation/_acciones.html' with obj_moderacion=av.moderacion obj_estado=av.get_moderacion_display %}
+{% endblock %}

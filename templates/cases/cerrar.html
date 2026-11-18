@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Cerrar caso{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-7">
+  <h1 class="h3 mb-3">Cerrar el caso {{ caso.codigo }}</h1>
+  <p>Al cerrar el caso dejará de aparecer entre los casos activos, su fotografía dejará de mostrarse públicamente y el historial de avistamientos quedará archivado.</p>
+  <form method="post" novalidate>{% csrf_token %}{% include '_form.html' %}<button class="btn btn-success" type="submit">Cerrar caso</button> <a class="btn btn-link" href="{{ caso.get_absolute_url }}">Cancelar</a></form>
+</div></div>
+{% endblock %}

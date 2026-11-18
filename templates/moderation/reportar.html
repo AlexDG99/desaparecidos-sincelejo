@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Reportar contenido{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-7">
+  <h1 class="h3 mb-3">Reportar contenido sospechoso</h1>
+  <p>{% if es_caso %}Caso <strong>{{ objetivo.codigo }}</strong> · {{ objetivo.nombre }}{% else %}Avistamiento del {{ objetivo.fecha|date:"d/m/Y" }} en el caso {{ objetivo.caso.codigo }}{% endif %}</p>
+  <form method="post" novalidate>{% csrf_token %}{% include '_form.html' %}<button class="btn btn-primary" type="submit">Enviar reporte</button> <a class="btn btn-link" href="javascript:history.back()">Cancelar</a></form>
+</div></div>
+{% endblock %}

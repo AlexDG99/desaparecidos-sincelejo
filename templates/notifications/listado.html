@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Notificaciones{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Notificaciones</h1>
+  {% if notificaciones_sin_leer %}<form method="post" action="{% url 'notifications:todas' %}">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary" type="submit">Marcar todas como leídas</button></form>{% endif %}
+</div>
+<ul class="list-group">
+  {% for n in notificaciones %}
+  <li class="list-group-item {% if not n.leida %}notif-unread{% endif %}">
+    <div class="d-flex justify-content-between flex-wrap gap-2">
+      <div>
+        <a class="fw-semibold" href="{% url 'notifications:abrir' n.pk %}">{{ n.titulo }}</a>{% if not n.leida %} <span class="badge text-bg-primary">Nueva</span>{% endif %}
+        <div>{{ n.mensaje }}</div>
+        <small class="text-muted">{{ n.creada_en|date:"d/m/Y H:i" }}</small>
+      </div>
+      {% if not n.leida %}<form method="post" action="{% url 'notifications:leida' n.pk %}">{% csrf_token %}<button class="btn btn-sm btn-link" type="submit">Marcar como leída</button></form>{% endif %}
+    </div>
+  </li>
+  {% empty %}<li class="list-group-item text-muted">No tiene notificaciones.</li>{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}{{ caso.nombre }}{% endblock %}
+{% block content %}
+<nav aria-label="Ruta de navegación"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'cases:listado' %}">Casos</a></li><li class="breadcrumb-item active" aria-current="page">{{ caso.codigo }}</li></ol></nav>
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+  <div>
+    <h1 class="h2 mb-1">{{ caso.nombre }}</h1>
+    <span class="badge text-bg-{% if caso.esta_activo %}danger{% else %}secondary{% endif %}">{{ caso.get_estado_display }}</span>
+    {% if caso.es_menor and ficha_completa %}<span class="badge text-bg-info">Menor de edad</span>{% endif %}
+    {% if es_titular_o_mod and not caso.es_publico %}<span class="badge text-bg-warning">{{ caso.get_moderacion_display }}</span>{% endif %}
+    <span class="text-muted ms-2 small">{{ caso.codigo }}</span>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    {% if puede_reportar and user.is_authenticated %}<a class="btn btn-danger" href="{% url 'sightings:crear' caso.codigo %}">Reportar avistamiento</a>{% elif puede_reportar %}<a class="btn btn-danger" href="{% url 'accounts:login' %}?next={% url 'sightings:crear' caso.codigo %}">Ingrese para reportar un avistamiento</a>{% endif %}
+    {% if ficha_completa %}<a class="btn btn-outline-primary" href="{% url 'cases:mapa' caso.codigo %}">Ver mapa{% if n_aprobados %} ({{ n_aprobados }}){% endif %}</a>{% endif %}
+  </div>
+</div>
+
+{% if not ficha_completa %}
+  <div class="alert alert-secondary" role="status">Este caso fue cerrado. Solo se conserva el nombre y el estado.</div>
+{% else %}
+<div class="row g-4">
+  <div class="col-md-4">
+    {% for f in caso.fotos.all %}<img class="img-fluid rounded mb-2 w-100" src="{% url 'cases:foto' caso.codigo f.pk %}" alt="Fotografía {{ forloop.counter }} de {{ caso.nombre }}">{% endfor %}
+  </div>
+  <div class="col-md-8">
+    <dl class="row">
+      <dt class="col-sm-4">Edad</dt><dd class="col-sm-8">{{ caso.edad }} años</dd>
+      <dt class="col-sm-4">Sexo</dt><dd class="col-sm-8">{{ caso.get_sexo_display }}</dd>
+      <dt class="col-sm-4">Desaparición</dt><dd class="col-sm-8">{{ caso.fecha_desaparicion|date:"d/m/Y" }}{% if caso.hora_aproximada %} · {{ caso.hora_aproximada|time:"H:i" }}{% endif %}</dd>
+      <dt class="col-sm-4">Zona</dt><dd class="col-sm-8">{{ caso.zona }}</dd>
+      <dt class="col-sm-4">Último lugar conocido</dt><dd class="col-sm-8">{{ caso.lugar }}</dd>
+      <dt class="col-sm-4">Señas particulares</dt><dd class="col-sm-8">{{ caso.senas|linebreaksbr }}</dd>
+      {% if caso.vestimenta %}<dt class="col-sm-4">Vestimenta</dt><dd class="col-sm-8">{{ caso.vestimenta|linebreaksbr }}</dd>{% endif %}
+    </dl>
+    <p class="small text-muted">Si tiene información, reporte un avistamiento: el contacto con la familia se canaliza a través de la plataforma.</p>
+    <div class="d-flex flex-wrap gap-2">
+      {% if user.is_authenticated and caso.es_publico %}<a class="btn btn-sm btn-outline-secondary" href="{% url 'moderation:reportar_caso' caso.pk %}">Reportar contenido sospechoso</a>{% endif %}
+      {% if es_titular and caso.es_publico and caso.esta_activo or user.es_administrador and caso.es_publico and caso.esta_activo %}<a class="btn btn-sm btn-success" href="{% url 'cases:cerrar' caso.codigo %}">Cerrar caso</a>{% endif %}
+      {% if user.es_administrador %}
+        <a class="btn btn-sm btn-outline-dark" href="{% url 'cases:exportar' caso.codigo 'pdf' %}">Exportar PDF</a>
+        <a class="btn btn-sm btn-outline-dark" href="{% url 'cases:exportar' caso.codigo 'csv' %}">Exportar CSV</a>
+        {% if not caso.esta_activo %}<form method="post" action="{% url 'cases:reabrir' caso.codigo %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-outline-warning" type="submit">Reabrir caso</button></form>{% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+<hr class="my-4">
+<section aria-labelledby="h-av">
+  <h2 id="h-av" class="h4">Avistamientos{% if not caso.esta_activo %} (archivo){% endif %}</h2>
+  {% for a in avistamientos %}
+    <article class="card mb-3" id="avistamiento-{{ a.pk }}">
+      <div class="card-body">
+        <div class="d-flex justify-content-between flex-wrap gap-2">
+          <h3 class="h6 mb-1">{{ a.fecha|date:"d/m/Y" }} · {{ a.hora|time:"H:i" }}</h3>
+          {% if es_titular_o_mod %}<span class="badge text-bg-{% if a.es_publico %}success{% elif a.moderacion == 'pendiente' %}warning{% else %}secondary{% endif %}">{{ a.get_moderacion_display }}</span>{% endif %}
+        </div>
+        <p class="mb-1">{{ a.descripcion|linebreaksbr }}</p>
+        <p class="small text-muted mb-2">Ubicación aproximada: {{ a.ubicacion_resumen }}</p>
+        <div class="d-flex flex-wrap gap-2 mb-2">
+          {% for m in a.archivos.all %}
+            {% if m.tipo == 'imagen' %}<a href="{% url 'sightings:media' m.pk %}" target="_blank" rel="noopener"><img class="thumb" src="{% url 'sightings:media' m.pk %}" alt="Evidencia fotográfica del avistamiento" loading="lazy"></a>
+            {% else %}<video class="thumb-video" controls preload="none" src="{% url 'sightings:media' m.pk %}" aria-label="Video de evidencia"></video>{% endif %}
+          {% endfor %}
+        </div>
+        {% if user.is_authenticated and a.es_publico %}<a class="small" href="{% url 'moderation:reportar_avistamiento' a.pk %}">Reportar contenido sospechoso</a>{% endif %}
+      </div>
+    </article>
+  {% empty %}
+    <p class="text-muted">Aún no hay avistamientos publicados para este caso.</p>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% if user.is_authenticated and user.es_administrador %}
+<hr class="my-4">
+<section aria-labelledby="h-aud">
+  <h2 id="h-aud" class="h4">Historial de auditoría</h2>
+  {% if historial %}
+  <div class="table-responsive"><table class="table table-sm">
+    <thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Rol</th><th>Acción</th><th>Detalle</th></tr></thead>
+    <tbody>{% for e in historial %}<tr><td>{{ e.creado_en|date:"d/m/Y H:i" }}</td><td>{{ e.usuario_email }}</td><td>{{ e.rol }}</td><td>{{ e.accion }} · {{ e.entidad }}</td><td>{{ e.detalle }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="text-muted">Sin eventos registrados.</p>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

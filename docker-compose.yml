@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: desaparecidos
+      POSTGRES_USER: desap
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-desap}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U desap -d desaparecidos"]
+      interval: 5s
+      retries: 10
+  web:
+    build: .
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_PASSWORD: ${DB_PASSWORD:-desap}
+      PRIVATE_MEDIA_ROOT: /data/private_media
+    depends_on:
+      db: {condition: service_healthy}
+    ports: ["8000:8000"]
+    volumes: [media:/data/private_media]
+volumes:
+  pgdata:
+  media:

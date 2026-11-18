@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Verificación pendiente{% endblock %}
+{% block content %}
+<div class="text-center py-4">
+  <h1 class="h3">Aún no puede publicar casos</h1>
+  <p>Su cuenta está en estado <strong>{{ usuario.get_verificacion_display }}</strong>. Debe completar la verificación de identidad para poder publicar un caso.</p>
+  {% if usuario.verificacion == 'rechazada' %}<p class="text-danger">Motivo del rechazo: {{ usuario.verificacion_motivo }}</p>{% endif %}
+  <a class="btn btn-primary" href="{% url 'accounts:reenviar_verificacion' %}">Gestionar mi verificación</a>
+</div>
+{% endblock %}

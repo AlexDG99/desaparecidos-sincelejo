@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Límite de reportes{% endblock %}
+{% block content %}
+<div class="text-center py-4">
+  <h1 class="h3">Demasiados avistamientos en la última hora</h1>
+  <p>Por seguridad y para evitar el spam, puede enviar hasta {{ limite }} avistamientos por hora. Intente de nuevo más tarde.</p>
+  <a class="btn btn-primary" href="{{ caso.get_absolute_url }}">Volver al caso</a>
+</div>
+{% endblock %}

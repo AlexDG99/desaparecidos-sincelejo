@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Verificar identidad{% endblock %}
+{% block content %}
+<a href="{% url 'moderation:verificaciones' %}">← Volver</a>
+<h1 class="h3 my-3">Verificar a {{ usuario.nombre }}</h1>
+<div class="row g-4">
+  <div class="col-lg-8"><dl><dt>Nombre registrado</dt><dd>{{ usuario.nombre }}</dd><dt>Cédula</dt><dd>{{ usuario.cedula }}</dd><dt>Teléfono</dt><dd>{{ usuario.telefono }}</dd><dt>Parentesco</dt><dd>{{ usuario.parentesco }}</dd><dt>Estado</dt><dd>{{ usuario.get_verificacion_display }}</dd></dl>
+    <p class="small text-muted">Revise que el nombre, el número de cédula y el teléfono registrados sean coherentes (por ejemplo, que el número de cédula tenga un formato válido y no esté repetido). La plataforma no almacena fotografías de documentos.</p>
+    <form method="post">{% csrf_token %}
+      <div class="mb-3"><label class="form-label" for="motivo">Motivo (obligatorio para rechazar)</label><textarea class="form-control" id="motivo" name="motivo" rows="2"></textarea></div>
+      <button class="btn btn-success" name="accion" value="aprobar" type="submit">Aprobar identidad</button>
+      <button class="btn btn-danger" name="accion" value="rechazar" type="submit">Rechazar</button>
+    </form></div>
+</div>
+{% endblock %}

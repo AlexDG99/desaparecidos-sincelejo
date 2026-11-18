@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+<section class="hero p-4 p-md-5 mb-5 rounded-4">
+  <span class="hero-badge">Red ciudadana · Sincelejo</span>
+  <h1 class="hero-title">Juntos podemos encontrar a quienes faltan</h1>
+  <p class="lead mb-4 hero-lead">Publique un caso verificado o aporte un avistamiento. Cada reporte es revisado por moderadores antes de hacerse público.</p>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-light btn-lg" href="{% url 'cases:listado' %}">Ver casos activos ({{ total_activos }})</a>
+    {% if not user.is_authenticated %}<a class="btn btn-outline-light btn-lg" href="{% url 'accounts:registro_familiar' %}">Reportar una desaparición</a>{% endif %}
+  </div>
+</section>
+<section class="row g-3 mb-5 steps" aria-label="Cómo funciona">
+  <div class="col-md-4"><div class="step"><span class="step-n">1</span><h2 class="h6">Reporte</h2><p class="mb-0 small text-muted">El familiar verificado publica el caso con fotografías y datos clave.</p></div></div>
+  <div class="col-md-4"><div class="step"><span class="step-n">2</span><h2 class="h6">Moderación</h2><p class="mb-0 small text-muted">Un moderador revisa cada caso y avistamiento antes de hacerlo público.</p></div></div>
+  <div class="col-md-4"><div class="step"><span class="step-n">3</span><h2 class="h6">Avistamientos</h2><p class="mb-0 small text-muted">Cualquier ciudadano puede aportar pistas con ubicación y evidencia.</p></div></div>
+</section>
+<h2 class="h3 mb-3 section-title">Casos recientes</h2>
+{% if recientes %}
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">{% for c in recientes %}{% include 'cases/_card.html' %}{% endfor %}</div>
+{% else %}
+  <p class="text-muted">Todavía no hay casos publicados.</p>
+{% endif %}
+{% endblock %}

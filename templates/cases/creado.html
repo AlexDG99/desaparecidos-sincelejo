@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Caso registrado{% endblock %}
+{% block content %}
+<div class="text-center py-4">
+  <h1 class="h3">Su caso fue registrado</h1>
+  <p>Código del caso: <strong class="fs-4">{{ caso.codigo }}</strong></p>
+  <p>Estado: <span class="badge text-bg-warning">Pendiente de moderación</span>. Le avisaremos cuando sea publicado.</p>
+  <a class="btn btn-primary" href="{% url 'cases:mis_casos' %}">Ver mis casos</a>
+</div>
+{% endblock %}

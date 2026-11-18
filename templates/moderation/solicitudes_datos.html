@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Solicitudes de datos{% endblock %}
+{% block content %}
+<a href="{% url 'moderation:cola' %}">← Volver a la cola</a>
+<h1 class="h3 my-3">Solicitudes de corrección o supresión de datos</h1>
+{% for s in solicitudes %}
+<div class="card mb-3"><div class="card-body">
+  <div class="d-flex justify-content-between flex-wrap"><h2 class="h6">{{ s.get_tipo_display }} · {{ s.usuario.nombre }} ({{ s.usuario.email }})</h2><span class="badge text-bg-{% if s.estado == 'atendida' %}success{% else %}warning{% endif %}">{{ s.get_estado_display }}</span></div>
+  <p>{{ s.mensaje }}</p><small class="text-muted">{{ s.creada_en|date:"d/m/Y H:i" }}</small>
+  {% if s.estado == 'pendiente' %}
+  <form method="post" action="{% url 'moderation:atender_solicitud' s.pk %}" class="mt-2">{% csrf_token %}
+    <label class="form-label" for="r{{ s.pk }}">Respuesta al titular</label><textarea class="form-control mb-2" id="r{{ s.pk }}" name="respuesta" rows="2"></textarea>
+    <button class="btn btn-primary btn-sm" type="submit">Marcar como atendida{% if s.tipo == 'eliminar' %} (suprime los datos de la cuenta){% endif %}</button>
+  </form>{% else %}<p class="mb-0 small">Respuesta: {{ s.respuesta|default:"—" }}</p>{% endif %}
+</div></div>
+{% empty %}<p class="text-muted">No hay solicitudes.</p>{% endfor %}
+{% endblock %}

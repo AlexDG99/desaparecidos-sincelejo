@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Auditoría{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Registro de auditoría</h1>
+<form method="get" class="card card-body mb-3" aria-label="Filtros de auditoría">
+  <div class="row g-2">
+    <div class="col-md-3"><label class="form-label" for="f-usuario">Usuario (correo)</label><input class="form-control" id="f-usuario" name="usuario" value="{{ filtros.usuario }}"></div>
+    <div class="col-md-2"><label class="form-label" for="f-accion">Acción</label><select class="form-select" id="f-accion" name="accion"><option value="">Todas</option>{% for v, l in acciones %}<option value="{{ v }}" {% if filtros.accion == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label" for="f-entidad">Entidad</label><select class="form-select" id="f-entidad" name="entidad"><option value="">Todas</option>{% for e in entidades %}<option value="{{ e }}" {% if filtros.entidad == e %}selected{% endif %}>{{ e }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label" for="f-desde">Desde</label><input class="form-control" type="date" id="f-desde" name="desde" value="{{ filtros.desde }}"></div>
+    <div class="col-md-2"><label class="form-label" for="f-hasta">Hasta</label><input class="form-control" type="date" id="f-hasta" name="hasta" value="{{ filtros.hasta }}"></div>
+    <div class="col-md-1 d-flex align-items-end"><button class="btn btn-primary w-100" type="submit">Filtrar</button></div>
+  </div>
+</form>
+<a class="btn btn-sm btn-outline-dark mb-3" href="{% url 'audit:exportar' %}?{{ querystring }}">Exportar resultado en CSV</a>
+<div class="table-responsive"><table class="table table-sm table-striped align-middle">
+  <caption class="visually-hidden">Eventos de auditoría, del más reciente al más antiguo</caption>
+  <thead><tr><th scope="col">Fecha y hora</th><th scope="col">Usuario</th><th scope="col">Rol</th><th scope="col">Acción</th><th scope="col">Entidad</th><th scope="col">IP</th><th scope="col">Detalle</th></tr></thead>
+  <tbody>{% for e in page %}<tr><td>{{ e.creado_en|date:"d/m/Y H:i:s" }}</td><td>{{ e.usuario_email|default:"—" }}</td><td>{{ e.rol }}</td><td>{{ e.get_accion_display }}</td><td>{{ e.entidad }}{% if e.entidad_id %} #{{ e.entidad_id }}{% endif %}</td><td>{{ e.ip|default:"—" }}</td><td>{{ e.detalle }}</td></tr>
+  {% empty %}<tr><td colspan="7" class="text-muted">No hay eventos para los filtros indicados.</td></tr>{% endfor %}</tbody>
+</table></div>
+{% include 'cases/_pagination.html' %}
+{% endblock %}

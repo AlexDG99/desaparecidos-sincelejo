@@ -1,0 +1,76 @@
+name: CI
+
+# Integración continua: cada push o pull request compila, prueba y construye la imagen.
+on:
+  push:
+    branches: [main, develop, 'feature/**', 'release/**', 'hotfix/**']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build-test:
+    name: Compilar y probar
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: desap
+          POSTGRES_PASSWORD: desap
+          POSTGRES_DB: desaparecidos
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U desap -d desaparecidos"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DEBUG: 'True'
+      SECRET_KEY: clave-solo-para-ci
+      DB_HOST: localhost
+      DB_PORT: '5432'
+      DB_NAME: desaparecidos
+      DB_USER: desap
+      DB_PASSWORD: desap
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-dev.txt
+
+      - name: Análisis estático (flake8)
+        run: flake8 .
+
+      - name: Verificar que no falten migraciones
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Verificar configuración de Django
+        run: python manage.py check
+
+      - name: Pruebas unitarias y funcionales con cobertura
+        run: |
+          coverage run manage.py test --verbosity 2
+          coverage report
+          coverage xml
+
+      - name: Guardar reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura
+          path: coverage.xml
+
+  docker:
+    name: Construir imagen Docker
+    runs-on: ubuntu-latest
+    needs: build-test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir la imagen
+        run: docker build -t desaparecidos:${{ github.sha }} .

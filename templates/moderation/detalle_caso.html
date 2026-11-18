@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Revisar caso{% endblock %}
+{% block content %}
+<a href="{% url 'moderation:cola' %}">← Volver a la cola</a>
+<h1 class="h3 my-3">Revisar caso {{ caso.codigo }} <span class="badge text-bg-warning">{{ caso.get_moderacion_display }}</span>{% if caso.es_menor %} <span class="badge text-bg-info">Menor de edad</span>{% endif %}</h1>
+<div class="row g-4">
+  <div class="col-md-4">{% for f in caso.fotos.all %}<img class="img-fluid rounded mb-2 w-100" src="{% url 'cases:foto' caso.codigo f.pk %}" alt="Fotografía {{ forloop.counter }}">{% endfor %}</div>
+  <div class="col-md-8"><dl class="row">
+    <dt class="col-sm-4">Nombre</dt><dd class="col-sm-8">{{ caso.nombre }}</dd>
+    <dt class="col-sm-4">Edad / sexo</dt><dd class="col-sm-8">{{ caso.edad }} años · {{ caso.get_sexo_display }}</dd>
+    <dt class="col-sm-4">Desaparición</dt><dd class="col-sm-8">{{ caso.fecha_desaparicion|date:"d/m/Y" }} · {{ caso.zona }} · {{ caso.lugar }}</dd>
+    <dt class="col-sm-4">Señas</dt><dd class="col-sm-8">{{ caso.senas|linebreaksbr }}</dd>
+    <dt class="col-sm-4">Vestimenta</dt><dd class="col-sm-8">{{ caso.vestimenta|default:"—" }}</dd>
+    <dt class="col-sm-4">Denuncia</dt><dd class="col-sm-8">{{ caso.numero_denuncia|default:"—" }}</dd>
+    <dt class="col-sm-4">Familiar</dt><dd class="col-sm-8">{{ caso.familiar.nombre }} ({{ caso.familiar.parentesco }}) · verificación: {{ caso.familiar.get_verificacion_display }}</dd>
+    {% if caso.es_menor %}<dt class="col-sm-4">Autorización del menor</dt><dd class="col-sm-8">{% if caso.autorizacion_menor %}<span class="text-success">Registrada</span> · actúa como {{ caso.calidad_declarada }}{% else %}<span class="text-danger">No registrada: no se puede aprobar</span>{% endif %}</dd>{% endif %}
+  </dl></div>
+</div>
+{% include 'moderation/_acciones.html' with obj_moderacion=caso.moderacion obj_estado=caso.get_moderacion_display %}
+{% endblock %}

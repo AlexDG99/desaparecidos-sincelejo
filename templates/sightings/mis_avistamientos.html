@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Mis avistamientos{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Mis avistamientos</h1>
+{% if avistamientos %}
+<div class="table-responsive"><table class="table align-middle">
+  <caption class="visually-hidden">Avistamientos que he enviado</caption>
+  <thead><tr><th scope="col">Caso</th><th scope="col">Fecha del avistamiento</th><th scope="col">Estado</th><th scope="col">Enviado</th></tr></thead>
+  <tbody>{% for a in avistamientos %}<tr>
+    <td><a href="{{ a.caso.get_absolute_url }}">{{ a.caso.codigo }}</a></td>
+    <td>{{ a.fecha|date:"d/m/Y" }} {{ a.hora|time:"H:i" }}</td>
+    <td>{{ a.get_moderacion_display }}{% if a.moderacion == 'rechazado' and a.moderacion_motivo %}<br><small class="motivo-rechazo">{{ a.moderacion_motivo }}</small>{% endif %}</td>
+    <td>{{ a.creado_en|date:"d/m/Y" }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% else %}<p class="text-muted">Aún no ha enviado avistamientos.</p>{% endif %}
+{% endblock %}

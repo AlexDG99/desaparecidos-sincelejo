@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Mis casos{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Mis casos</h1>
+{% if casos %}
+<div class="table-responsive"><table class="table align-middle">
+  <caption class="visually-hidden">Casos que he registrado</caption>
+  <thead><tr><th scope="col">Código</th><th scope="col">Nombre</th><th scope="col">Moderación</th><th scope="col">Estado</th><th scope="col">Registrado</th></tr></thead>
+  <tbody>{% for c in casos %}<tr>
+    <td><a href="{{ c.get_absolute_url }}">{{ c.codigo }}</a></td><td>{{ c.nombre }}</td>
+    <td>{{ c.get_moderacion_display }}{% if c.moderacion == 'rechazado' and c.moderacion_motivo %}<br><small class="text-danger">{{ c.moderacion_motivo }}</small>{% endif %}</td>
+    <td>{{ c.get_estado_display }}</td><td>{{ c.creado_en|date:"d/m/Y" }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% else %}<p class="text-muted">Aún no ha registrado casos.</p>{% endif %}
+<a class="btn btn-primary" href="{% url 'cases:crear' %}">Reportar una desaparición</a>
+{% endblock %}

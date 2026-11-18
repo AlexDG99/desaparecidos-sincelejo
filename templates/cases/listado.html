@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Casos{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Personas desaparecidas</h1>
+<form method="get" class="card card-body mb-4" role="search" aria-label="Buscar y filtrar casos">
+  <div class="row g-3">
+    <div class="col-md-4">{{ form.q.label_tag }}{{ form.q }}</div>
+    <div class="col-md-4">{{ form.zona.label_tag }}{{ form.zona }}</div>
+    <div class="col-md-4">{{ form.estado.label_tag }}{{ form.estado }}</div>
+    <div class="col-md-4">{{ form.desde.label_tag }}{{ form.desde }}</div>
+    <div class="col-md-4">{{ form.hasta.label_tag }}{{ form.hasta }}</div>
+    <div class="col-md-4 d-flex align-items-end gap-2"><button class="btn btn-primary" type="submit">Buscar</button><a class="btn btn-outline-secondary" href="{% url 'cases:listado' %}">Limpiar filtros</a></div>
+  </div>
+</form>
+{% if page.object_list %}
+  <p class="text-muted" aria-live="polite">{{ page.paginator.count }} caso{{ page.paginator.count|pluralize }}</p>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3">{% for c in page %}{% include 'cases/_card.html' %}{% endfor %}</div>
+  {% include 'cases/_pagination.html' %}
+{% else %}
+  <div class="alert alert-secondary" role="status"><p class="mb-2">No se encontraron casos.</p>{% if hay_filtros %}<a class="btn btn-sm btn-outline-primary" href="{% url 'cases:listado' %}">Limpiar filtros</a>{% endif %}</div>
+{% endif %}
+{% endblock %}
