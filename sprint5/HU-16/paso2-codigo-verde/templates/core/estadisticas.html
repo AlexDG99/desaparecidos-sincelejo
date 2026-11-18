@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Estadísticas{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Estadísticas generales</h1>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4"><div class="stat-card"><span class="stat-valor">{{ resumen.casos_activos }}</span><span class="stat-etiqueta">Casos activos</span></div></div>
+  <div class="col-6 col-md-4"><div class="stat-card"><span class="stat-valor">{{ resumen.casos_pendientes }}</span><span class="stat-etiqueta">Casos pendientes de moderación</span></div></div>
+  <div class="col-6 col-md-4"><div class="stat-card"><span class="stat-valor">{{ resumen.casos_cerrados }}</span><span class="stat-etiqueta">Casos cerrados</span></div></div>
+  <div class="col-6 col-md-6"><div class="stat-card"><span class="stat-valor">{{ resumen.avistamientos_publicados }}</span><span class="stat-etiqueta">Avistamientos publicados</span></div></div>
+  <div class="col-6 col-md-6"><div class="stat-card"><span class="stat-valor">{{ resumen.avistamientos_pendientes }}</span><span class="stat-etiqueta">Avistamientos pendientes</span></div></div>
+</div>
+<h2 class="h5">Usuarios por rol</h2>
+<ul class="list-group">
+  {% for rol, total in resumen.usuarios.items %}<li class="list-group-item d-flex justify-content-between text-capitalize">{{ rol }}<span class="badge text-bg-secondary">{{ total }}</span></li>{% endfor %}
+</ul>
+{% endblock %}
